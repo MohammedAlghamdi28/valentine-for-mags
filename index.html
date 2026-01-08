@@ -30,7 +30,7 @@ body {
   border-radius: 24px;
   padding: 30px 22px;
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   animation: fadeIn 0.6s ease;
 }
@@ -72,14 +72,10 @@ button:hover {
   color: #333;
 }
 
-.hidden {
-  display: none;
-}
-
 img {
   width: 100%;
   border-radius: 16px;
-  margin-top: 20px;
+  margin-top: 18px;
 }
 
 .countdown {
@@ -114,6 +110,32 @@ img {
   50% { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
+
+/* 👺 Goblin Animation */
+.goblin {
+  font-size: 64px;
+  margin-top: 18px;
+  animation: goblinBounce 1.2s infinite ease-in-out,
+             goblinWiggle 0.8s infinite alternate;
+}
+
+@keyframes goblinBounce {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes goblinWiggle {
+  from { transform: rotate(-5deg); }
+  to   { transform: rotate(5deg); }
+}
+
+.goblin-caption {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: #777;
+  font-style: italic;
+}
 </style>
 </head>
 
@@ -127,6 +149,7 @@ img {
 const card = document.getElementById("card");
 const music = document.getElementById("music");
 let step = 0;
+let musicStarted = false;
 
 const valentineDate = new Date("February 14, 2026 00:00:00").getTime();
 
@@ -134,31 +157,55 @@ function countdownText() {
   const now = new Date().getTime();
   const diff = valentineDate - now;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return days >= 0 ? `${days} days until Valentine’s Day 💘` : "It’s Valentine’s Day 💖";
+  return days >= 0
+    ? `${days} days until Valentine’s Day 💘`
+    : "It’s Valentine’s Day 💖";
 }
 
 const screens = [
   `
   <h1>Hey Mags 💕</h1>
-  <p>I wish I could be there with you right now.</p>
-  <button onclick="next()">Tap to continue</button>
+  <p>
+    I wish I could be right there with you —  
+    stealing glances, holding your hand,  
+    and pretending distance isn’t a thing.
+  </p>
+  <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTBvZWR3YWp6aWV0c2k3Mnl4eGRrdzRveXRldXpwYXc1MnAwNzA0OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8ODEvGereDW749TL5H/giphy.gif">
+  <button onclick="next(true)">Tap to continue</button>
   `,
   `
-  <h1>Long distance sucks 😌</h1>
-  <p>But it doesn’t change how much I care about you.</p>
+  <h1>Long distance isn’t easy 😌</h1>
+  <p>
+    Some days it’s frustrating,  
+    some days it’s quiet,  
+    but every single day  
+    it reminds me how much you mean to me.
+  </p>
+  <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWw4dm1taWh1czJrMTh3ZnQ2MTU4bHl5cTJjY3JyZHkwM2V4NWc1ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/myPdoRAlad0J2/giphy.gif">
   <div class="countdown">${countdownText()}</div>
   <button onclick="next()">Next</button>
   `,
   `
   <h1>I miss you</h1>
-  <p>In the quiet moments.</p>
+  <p>In the little moments.</p>
   <p>In the random moments.</p>
-  <p>In the moments I wish I could hug you.</p>
+  <p>In the moments I laugh and wish you were next to me.</p>
+  <p>
+    And especially in the moments  
+    when all I want is to pull you into a hug  
+    and not let go.
+  </p>
+  <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif">
   <button onclick="next()">Keep going</button>
   `,
   `
-  <h1>So I have a question 💘</h1>
+  <h1>So I was thinking… 💘</h1>
+  <p>
+    Even with the miles between us,  
+    even through a screen —
+  </p>
   <p><strong>Will you be my Valentine?</strong></p>
+  <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHFwY3U2eW15bDB0bzA3MGJoOHRod2F3YXpmOXlia2w1eGVtZXB1ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xUOwG00IFPul5BU9Us/giphy.gif">
   <div class="buttons">
     <button onclick="yes()">Yes 💕</button>
     <button class="obviously" onclick="yes()">Obviously 😍</button>
@@ -166,27 +213,40 @@ const screens = [
   `
 ];
 
-function next() {
+function next(startMusic = false) {
+  if (startMusic && !musicStarted) {
+    music.play().catch(()=>{});
+    musicStarted = true;
+  }
   step++;
   card.innerHTML = screens[step];
 }
 
 function yes() {
-  music.play();
-
   confetti({
-    particleCount: 200,
-    spread: 90,
+    particleCount: 220,
+    spread: 100,
     origin: { y: 0.6 }
   });
 
   card.innerHTML = `
     <h1>YAY 💖</h1>
     <div class="hug">🫂</div>
-    <p>This is a virtual hug — squeeze it as long as you want.</p>
-    <p>I miss you more than I can put into words.</p>
+    <p>
+      This is a virtual hug —  
+      close your eyes and imagine it’s real.
+    </p>
+    <p>
+      I miss you more than words can explain,  
+      and I can’t wait for the day  
+      I don’t have to send hugs like this.
+    </p>
     <p><strong>Happy Valentine’s Day, Mags 💕</strong></p>
-    <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">
+
+    <img src="https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif">
+
+    <div class="goblin">👺</div>
+    <div class="goblin-caption">me waiting for your reply</div>
   `;
 
   hearts();
